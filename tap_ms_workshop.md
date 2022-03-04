@@ -2,7 +2,7 @@ Advancing bitcoin Hands on Miniscript workshop
 
 ### Pre-requities:
 
--rust: Visit rustup.rs (TODO: confirm link later)
+- rust: Install using `rustup`. We will use rust 1.58 (stable as of March 4 2022) 
 
 - hal:
 	- You can clone via https `https://github.com/sanket1729/hal`
@@ -61,12 +61,12 @@ In this workshop, we will create a complex taproot descriptor using `hal` and tr
 
 - Decide your spending policy. What policy should govern the funds? To follow along with this workshop consider the following policy:
 - To follow along this workshop, you can use this spending policy.
-
+```
 - 99@thresh(2, pk(hA), pk(S)),
 - 1@or
 	- 99@pk(cA)
 	- 1@(and(pk(In), older(LONG_TIME)) # this indicates the key will never likely be used to spend
-
+```
 There are three different
 - Happy case that we expect to happen occur 99% of times
 	- Our hot mobile wallet key `hA`
@@ -90,12 +90,13 @@ If you an expirienced bitcoin dev and have dealt with psbts before, you can crea
 ### Sample new keys with hal
 
 For this workshop, we will directly sample private keys from hal and use it create descriptor. Sample keys using `hal key generate`
-
+```
+# My secret insecure Wallet
 hA = L5T1XNNoMxQpDyQGD8dgMvEB9wpxScxcovaYAmJhr1zCgqcCCd9v
 S  = Kwc3gGyaLJe6HvZWTtyS8eu49assTZwdvGfcXKVke7tZjYmb6uJr
 In = KzCB2QwrKen2Bnx2Q299iPUV8TF1UzPGWDGZFtpUtnodeegSCn9F
 cA = KyyvHq1wxvVEi3V8MfoqaC8WXkcqpiNkr9BQJocKdRLJDAa6LEVB
-
+```
 Replace the keys with private keys and save the desciptor
 
 ```
