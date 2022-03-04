@@ -2,14 +2,14 @@ Advancing bitcoin Hands on Miniscript workshop
 
 ### Pre-requities:
 
-- rust: Install using `rustup`. We will use rust 1.58 (stable as of March 4 2022) 
+- rust: Install using `rustup`. We will use rust 1.58 (stable as of March 4 2022)
 
 - hal:
 	- You can clone via https `https://github.com/sanket1729/hal`
 	- Checkout the `adv_btc_workshop` branch: `git checkout adv_btc_workshop`.
-	- Build the project using `cargo build`. 
-	- Optionally, for your convience you can add `./target/debug/hal` to your `$PATH` in the current session.
-- Bitcoin core(optional, but recommended): 
+	- Build the project using `cargo build`.
+	- Optionally, for your convenience you can add `./target/debug/hal` to your `$PATH` in the current session.
+- Bitcoin core(optional, but recommended):
 	- go to `https://github.com/bitcoin/bitcoin`
 	- Read the instructions in `doc` to install on your operating system.
 	- We don't need the sync in for this workshop. We are only going to use bitcoin core in regtest
@@ -45,7 +45,7 @@ Output Script Descriptors are a simple language which can be used to describe co
 
 - Miniscript would be added as new `SCRIPT` to `wsh` and `tr`
 
-### Policy languge:
+### Policy language:
 
 Simplest form in which we can spending conditions. Abstract form for representing spending conditions
 - Keys
@@ -70,22 +70,22 @@ In this workshop, we will create a complex taproot descriptor using `hal` and tr
 There are three different
 - Happy case that we expect to happen occur 99% of times
 	- Our hot mobile wallet key `hA`
-	- Co-signer key `S` that will sign the transaction. This could be third-paty like Green that provides 2FA service
-- (1%) If we lose mobile wallet, or co-signer is not participating, or if we forget the OTP: 
-	- We can use cold keys `Ca` and `Cb` from paper wallets/HW wallets etc 
-- (0.01%)If we just happen to die :( , we have already given a paper wallet with pk inheritance `In` to trusted family/friend that they can use after a long time `LONG_TIME`. We can keep spending funds back to policy to reset the `LONG_TIME`. 
+	- Co-signer key `S` that will sign the transaction. This could be third-party like Green that provides 2FA service
+- (1%) If we lose mobile wallet, or co-signer is not participating, or if we forget the OTP:
+	- We can use cold keys `Ca` and `Cb` from paper wallets/HW wallets etc
+- (0.01%)If we just happen to die :( , we have already given a paper wallet with pk inheritance `In` to trusted family/friend that they can use after a long time `LONG_TIME`. We can keep spending funds back to policy to reset the `LONG_TIME`.
 
 our final policy is then
 ```
 POL="or(99@thresh(2,pk(hA),pk(S)),1@or(99@pk(Ca),1@and(pk(In),older(9))))"
 ```
 
-Compile the policy to a descriptor using `hal ms policy $POL`. 
+Compile the policy to a descriptor using `hal ms policy $POL`.
 
 ```
 DESC="tr(Ca,{and_v(v:pk(In),older(9)),multi_a(2,hA,S)})"
 ```
-If you an expirienced bitcoin dev and have dealt with psbts before, you can create your own spending policy. Perhaps, even collaborate with your neighbor in creating a policy that in such a way that both of you can spend funds. Don't worry if you mess up, regtest coins are free!
+If you an experienced bitcoin dev and have dealt with psbts before, you can create your own spending policy. Perhaps, even collaborate with your neighbor in creating a policy that in such a way that both of you can spend funds. Don't worry if you mess up, regtest coins are free!
 
 ### Sample new keys with hal
 
@@ -97,13 +97,13 @@ S  = Kwc3gGyaLJe6HvZWTtyS8eu49assTZwdvGfcXKVke7tZjYmb6uJr
 In = KzCB2QwrKen2Bnx2Q299iPUV8TF1UzPGWDGZFtpUtnodeegSCn9F
 cA = KyyvHq1wxvVEi3V8MfoqaC8WXkcqpiNkr9BQJocKdRLJDAa6LEVB
 ```
-Replace the keys with private keys and save the desciptor
+Replace the keys with private keys and save the descriptor
 
 ```
 PRIV_DESC="tr(KyyvHq1wxvVEi3V8MfoqaC8WXkcqpiNkr9BQJocKdRLJDAa6LEVB,{and_v(v:pk(KzCB2QwrKen2Bnx2Q299iPUV8TF1UzPGWDGZFtpUtnodeegSCn9F),older(9)),multi_a(2,L5T1XNNoMxQpDyQGD8dgMvEB9wpxScxcovaYAmJhr1zCgqcCCd9v,Kwc3gGyaLJe6HvZWTtyS8eu49assTZwdvGfcXKVke7tZjYmb6uJr)})"
 ```
 
-Get the information about the descriptor using `hal ms descriptor --regtest $PRIV_DESC`. This will output a `key_map` and a descrpitor replacing all the private keys with public keys and a public descriptor. Copy paste the key map in a file and this is your INSECURE wallet! For this demo, we only deal with stateless wallets spending a single transaction. In practice, these would be BIP32 wallets with xpubs and some derivation paths with wildcards.
+Get the information about the descriptor using `hal ms descriptor --regtest $PRIV_DESC`. This will output a `key_map` and a descriptor replacing all the private keys with public keys and a public descriptor. Copy paste the key map in a file and this is your INSECURE wallet! For this demo, we only deal with stateless wallets spending a single transaction. In practice, these would be BIP32 wallets with xpubs and some derivation paths with wildcards.
 
 ```
 "key_map": {
@@ -125,7 +125,7 @@ Save the address:
 ADDR=bcrt1pzk99wda22uprx5exsnqzlgdvup2pqsu32lys2v8x649r49qeh5gsy9lcjn
 ```
 
-Using bitcoin-core client send 1 BTC to this address. If you don't have bitcoin core installed, you can skip this step. We will use a hardcoded prevout instead. In the `src` folder in bitcoin core directory, you can run the following commands to get the rawtx that spends funds to this transaction. You would need to generate blocks to get initial balance using `./bitcoin-cli -generate 102`  
+Using bitcoin-core client send 1 BTC to this address. If you don't have bitcoin core installed, you can skip this step. We will use a hardcoded prevout instead. In the `src` folder in bitcoin core directory, you can run the following commands to get the rawtx that spends funds to this transaction. You would need to generate blocks to get initial balance using `./bitcoin-cli -generate 102`
 ```
 TX=$(./bitcoin-cli --regtest sendtoaddress $ADDR 1.0)
 RAW_TX=$(./bitcoin-cli --regtest getrawtransaction $TX)
@@ -156,7 +156,7 @@ First, let us create a rawtransaction that spends from this address using `hal t
 }
 ```
 
-Save the spending raw_tx in a vairable `SPEND_TX`. You can check this has input and one output by inspecting `hal tx decode $SPEND_TX`
+Save the spending raw_tx in a variable `SPEND_TX`. You can check this has input and one output by inspecting `hal tx decode $SPEND_TX`
 
 ### Tx signing and finalizing with psbt
 
@@ -186,13 +186,13 @@ HA_SIGNED=$(hal psbt rawsign $UNSIGNED_PSBT 0 L5T1XNNoMxQpDyQGD8dgMvEB9wpxScxcov
 S_SIGNED=$(hal psbt rawsign $UNSIGNED_PSBT 0 Kwc3gGyaLJe6HvZWTtyS8eu49assTZwdvGfcXKVke7tZjYmb6uJr)
 ```
 
-Combine the signed psbts with signatures from both parites
+Combine the signed psbts with signatures from both parties
 
 ```
 PSBT_MERGED=$(hal psbt merge $HA_SIGNED $S_SIGNED)
 ```
 
-Finlize the psbt, the miniscrpit finalizer will figure out what to based on availalbe sigs
+Finalize the psbt, the miniscript finalizer will figure out what to based on available sigs, hash preimages
 
 ```
 EXT_TX2=$(hal psbt finalize $PSBT_MERGED)
@@ -207,7 +207,7 @@ KEY_SIGNED=$(hal psbt rawsign $UNSIGNED_PSBT 0 KyyvHq1wxvVEi3V8MfoqaC8WXkcqpiNkr
 EXT_TX2=$(hal psbt finalize $KEY_SIGNED)
 ```
 
-Next, you can test with bitcoin-cli with `testmempoolaccept '''["<ext_tx_hex>"]'''`. 
+Next, you can test with bitcoin-cli with `testmempoolaccept '''["<ext_tx_hex>"]'''`.
 
 ### Inheritance spend
 
